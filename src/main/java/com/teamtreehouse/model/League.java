@@ -1,5 +1,6 @@
 package com.teamtreehouse.model;
 
+import com.teamtreehouse.compareUtils.PlayerHeightComparator;
 import com.teamtreehouse.exceptions.MaximumTeamsException;
 import com.teamtreehouse.exceptions.PlayerAlreadyOnTeamException;
 import com.teamtreehouse.exceptions.TeamExistsException;
@@ -15,9 +16,9 @@ public class League {
         freePlayers = new TreeSet<>(Arrays.asList(players));
         heightClasses = new TreeMap<String, int[]>()
         {{
-            put("small", new int[]{35, 40});
-            put("medium", new int[]{41, 46});
-            put("large", new int[]{47, 50});
+            put("Short", new int[]{35, 40});
+            put("Medium", new int[]{41, 46});
+            put("Tall", new int[]{47, 50});
         }};
         teams = new TreeMap<>();
     }
@@ -72,6 +73,23 @@ public class League {
 
     public void removePlayerFromTeam(String teamName, String playerName) {
         freePlayers.add(teams.get(teamName).removePlayer(playerName));
+    }
+
+    public Map<String, Set<Player>> generateHeightReport(String teamName) {
+        Set<Player> playersByHeight = teams.get(teamName).getPlayersByHeight();
+        Map<String, Set<Player>> reportResults = new TreeMap<>();
+        for (Map.Entry<String, int[]> heightClass : heightClasses.entrySet()) {
+            int minHeight = heightClass.getValue()[0];
+            int maxHeight = heightClass.getValue()[1];
+            String categoryName = minHeight + "-" + maxHeight + " inches (" + heightClass.getKey() + ")";
+            reportResults.put(categoryName, new TreeSet<Player>(new PlayerHeightComparator()));
+            playersByHeight.forEach(player -> {
+                if (player.getHeightInInches() >= minHeight && player.getHeightInInches() <= maxHeight) {
+                    reportResults.get(categoryName).add(player);
+                }
+            });
+        }
+        return reportResults;
     }
 
 }

@@ -57,7 +57,7 @@ public class Menu {
                 removePlayer();
                 break;
             case "report":
-                //reportHeight();
+                reportHeight();
                 break;
             case "balance":
                 //reportLeagueBalance();
@@ -112,6 +112,24 @@ public class Menu {
             System.out.printf("%s removed from Team %s.%n", playerChoice, teamChoice);
         }
 
+    }
+
+    public void reportHeight() {
+        if (league.getTeams().size() < 1) {
+            System.out.printf("There are currently no teams in the league! Please create a team first.");
+        } else if (league.getAssignedPlayerCount() < 1) {
+            System.out.printf("There are currently no players assigned to any teams in the league! Please assign a player first.");
+        } else {
+            String teamChoice = promptForTeamChoice(true);
+            Map<String, Set<Player>> heightReport = league.generateHeightReport(teamChoice);
+            System.out.printf("%n==== Height Report for Team %s ====%n", teamChoice);
+            heightReport.forEach((s, players) -> {
+                System.out.printf("%n%s: (Total Players in Class: %d)%n", s, players.size());
+                players.forEach(player -> {
+                    System.out.printf(" - %s%n", player.toString());
+                });
+            });
+        }
     }
 
     private ArrayList<String> getAndPrintAvailablePlayers(Set<Player> players) {
