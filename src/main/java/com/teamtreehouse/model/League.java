@@ -1,6 +1,7 @@
 package com.teamtreehouse.model;
 
 import com.teamtreehouse.exceptions.MaximumTeamsException;
+import com.teamtreehouse.exceptions.TeamExistsException;
 
 import java.util.*;
 
@@ -35,14 +36,14 @@ public class League {
         return freePlayers;
     }
 
-    public boolean createTeam(String teamName, String coachName) throws MaximumTeamsException {
+    public boolean createTeam(String teamName, String coachName) throws Exception {
         if (teams.size() > freePlayers.size()) {
             throw new MaximumTeamsException("The number of teams exceeds the amount of free players. No more teams may be created!");
         } else {
             Team newTeam = new Team(teamName, coachName);
             if  (teams.put(teamName, newTeam) == null) {
                 return true;
-            } else return false;
+            } else throw new TeamExistsException("The team " + teamName + " already exists!");
         }
     }
 

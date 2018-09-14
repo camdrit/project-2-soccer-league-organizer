@@ -1,5 +1,6 @@
 package com.teamtreehouse;
 
+import com.teamtreehouse.exceptions.MaximumTeamsException;
 import com.teamtreehouse.model.League;
 
 import java.io.BufferedReader;
@@ -33,9 +34,7 @@ public class Menu {
             while (!response.equals("quit")) {
                 System.out.printf("%nMenu%n%n");
                 menuOptions.forEach((option, optionText) -> { System.out.printf("%s - %s %n", option, optionText); });
-                System.out.printf("%nChoose an option: ");
-
-                response = reader.readLine().trim().toLowerCase();
+                response = promptForInput("%nPlease Choose an option: ");
                 parseChoice(response);
             }
             System.out.print("Exiting...");
@@ -48,7 +47,7 @@ public class Menu {
     public void parseChoice(String choice) throws IOException {
         switch (choice) {
             case "create":
-                //createTeam();
+                createTeam();
                 break;
             case "add":
                 //addPlayer();
@@ -71,5 +70,52 @@ public class Menu {
                 System.out.printf("That didn't seem to be a valid choice. Please try again. %n");
                 break;
         }
+    }
+
+    public void createTeam() {
+        String teamName = promptForInput("What is the team name? ");
+        String coachName = promptForInput("What is the coach name? ");
+
+
+        try {
+            league.createTeam(teamName, coachName);
+            System.out.printf("Team %s coached by %s created.%n", teamName, coachName);
+        } catch (Exception e) {
+            System.out.printf("%s", e.getMessage());
+        }
+    }
+
+    private String promptForInput(String message) {
+        String response = "";
+        while (response.isEmpty()) {
+            try {
+                System.out.printf(message);
+                response = reader.readLine();
+            } catch (IOException e) {
+                System.out.printf("It looks like there was an issue handling your input. The message was: %s",
+                        e.getMessage());
+                System.out.print("Please try again. ");
+            }
+        }
+        return response;
+    }
+
+    private int promptForInputExpectingInteger(String message, int maximumValue) {
+        int response = 0;
+        while (response <= 0 || response > maximumValue) {
+            try {
+                response = Integer.parseInt(promptForInput(message));
+                if (response <= 0) {
+                    throw new NumberFormatException();
+                } else if (response > maximumValue) {
+                    throw new IndexOutOfBoundsException();
+                }
+            } catch (NumberFormatException e) {
+                System.out.printf("The value you provided was not a non-zero number. Please try again. %n");
+            } catch (IndexOutOfBoundsException e) {
+                System.out.printf("The value you provided was greater than the maximum value: %d", maximumValue);
+            }
+        }
+        return response;
     }
 }
