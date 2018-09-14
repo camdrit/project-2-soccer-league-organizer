@@ -60,7 +60,7 @@ public class Menu {
                 reportHeight();
                 break;
             case "balance":
-                //reportLeagueBalance();
+                reportLeagueBalance();
                 break;
             case "roster":
                 //printTeamRoster();
@@ -87,7 +87,9 @@ public class Menu {
 
     public void addPlayer() {
         if (league.getTeams().size() < 1) {
-            System.out.printf("There are currently no teams in the league! Please create a team first.");
+            System.out.print("There are currently no teams in the league! Please create a team first.");
+        } else if (league.getFreePlayers().size() < 1) {
+            System.out.print("There are currently no free players in the league. No players may be assigned.");
         } else {
             String playerChoice = promptForPlayerChoice(league.getFreePlayers());
             String teamChoice = promptForTeamChoice(false);
@@ -124,10 +126,31 @@ public class Menu {
             Map<String, Set<Player>> heightReport = league.generateHeightReport(teamChoice);
             System.out.printf("%n==== Height Report for Team %s ====%n", teamChoice);
             heightReport.forEach((s, players) -> {
-                System.out.printf("%n%s: (Total Players in Class: %d)%n", s, players.size());
+                System.out.printf("%n%s:%n", s);
                 players.forEach(player -> {
                     System.out.printf(" - %s%n", player.toString());
                 });
+                System.out.printf("Total Players in Class: %d%n", players.size());
+            });
+        }
+    }
+
+    public void reportLeagueBalance() {
+        if (league.getTeams().size() < 1) {
+            System.out.printf("There are currently no teams in the league! Please create a team first.");
+        } else if (league.getAssignedPlayerCount() < 1) {
+            System.out.printf("There are currently no players assigned to any teams in the league! Please assign a player first.");
+        } else {
+            System.out.printf("==== League Balance Report ====%n");
+            Map<String, Team> teams = league.getTeams();
+            teams.forEach((s, team) -> {
+                if (team.getPlayers().size() > 1) {
+                    System.out.printf("%nTeam %s:%n", s);
+                    team.getPlayersByExperience().forEach(player -> {
+                        System.out.printf(" - %s%n", player.toString());
+                    });
+                    System.out.printf("Experience Rating: %.0f%%%n", team.calculateExperienceRating());
+                }
             });
         }
     }

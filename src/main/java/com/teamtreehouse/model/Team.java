@@ -40,7 +40,7 @@ public class Team implements Comparable<Team> {
     }
 
     public double calculateExperienceRating() {
-        int countOfExperienced = 0;
+        double countOfExperienced = 0;
         for (Map.Entry<String, Player> player : players.entrySet()) {
             if (player.getValue().isPreviousExperience()) {
                 countOfExperienced++;
