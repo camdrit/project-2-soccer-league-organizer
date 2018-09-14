@@ -63,7 +63,7 @@ public class Menu {
                 reportLeagueBalance();
                 break;
             case "roster":
-                //printTeamRoster();
+                printTeamRoster();
                 break;
             case "quit":
                 break;
@@ -153,6 +153,24 @@ public class Menu {
                 }
             });
         }
+    }
+
+    public void printTeamRoster() {
+        if (league.getTeams().size() < 1) {
+            System.out.printf("There are currently no teams in the league! Please create a team first.");
+        } else if (league.getAssignedPlayerCount() < 1) {
+            System.out.printf("There are currently no players assigned to any teams in the league! Please assign a player first.");
+        } else {
+            String teamChoice = promptForTeamChoice(true);
+            printTeamPlayers(teamChoice);
+        }
+    }
+
+    private void printTeamPlayers(String teamName) {
+        System.out.printf("==== Team %s Roster ====%n%n", teamName);
+        league.getTeamPlayers(teamName).forEach(player ->  {
+            System.out.printf("%s%n", player.toString());
+        });
     }
 
     private ArrayList<String> getAndPrintAvailablePlayers(Set<Player> players) {
