@@ -4,6 +4,7 @@ import com.teamtreehouse.compareUtils.PlayerHeightComparator;
 import com.teamtreehouse.exceptions.MaximumTeamsException;
 import com.teamtreehouse.exceptions.PlayerAlreadyOnTeamException;
 import com.teamtreehouse.exceptions.TeamExistsException;
+import com.teamtreehouse.exceptions.TeamFullException;
 
 import java.util.*;
 
@@ -65,10 +66,15 @@ public class League {
         }
     }
 
-    public void addPlayerToTeam(String teamName, String playerName) throws PlayerAlreadyOnTeamException {
-        Player playerToAdd = getPlayerByName(playerName);
-        boolean results = teams.get(teamName).addPlayer(playerToAdd);
-        if (results) { freePlayers.remove(playerToAdd); } else { throw new PlayerAlreadyOnTeamException(playerName + " is already on Team " + teamName + "!"); }
+    public void addPlayerToTeam(String teamName, String playerName) throws PlayerAlreadyOnTeamException, TeamFullException {
+        Team selectedTeam = teams.get(teamName);
+        if (selectedTeam.getPlayers().size() >= 11) {
+            throw new TeamFullException("Team " + teamName + " is full! You must remove at least 1 player before adding another.");
+        } else {
+            Player playerToAdd = getPlayerByName(playerName);
+            boolean results = teams.get(teamName).addPlayer(playerToAdd);
+            if (results) { freePlayers.remove(playerToAdd); } else { throw new PlayerAlreadyOnTeamException(playerName + " is already on Team " + teamName + "!"); }
+        }
     }
 
     public void removePlayerFromTeam(String teamName, String playerName) {
