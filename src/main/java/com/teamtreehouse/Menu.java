@@ -77,7 +77,6 @@ public class Menu {
         String teamName = promptForInput("What is the team name? ");
         String coachName = promptForInput("What is the coach name? ");
 
-
         try {
             league.createTeam(teamName, coachName);
             System.out.printf("Team %s coached by %s created.%n", teamName, coachName);
@@ -87,22 +86,32 @@ public class Menu {
     }
 
     public void addPlayer() {
-        String playerChoice = promptForPlayerChoice(league.getFreePlayers());
-        String teamChoice = promptForTeamChoice(false);
-        try {
-            league.addPlayerToTeam(teamChoice, playerChoice);
-            System.out.printf("%s added to Team %s.%n", playerChoice, teamChoice);
-        } catch (Exception e) {
-            System.out.printf("%s%n", e.getMessage());
+        if (league.getTeams().size() < 1) {
+            System.out.printf("There are currently no teams in the league! Please create a team first.");
+        } else {
+            String playerChoice = promptForPlayerChoice(league.getFreePlayers());
+            String teamChoice = promptForTeamChoice(false);
+            try {
+                league.addPlayerToTeam(teamChoice, playerChoice);
+                System.out.printf("%s added to Team %s.%n", playerChoice, teamChoice);
+            } catch (Exception e) {
+                System.out.printf("%s%n", e.getMessage());
+            }
         }
-
     }
 
     public void removePlayer() {
-        String teamChoice = promptForTeamChoice(true);
-        String playerChoice = promptForPlayerChoice(league.getTeamPlayers(teamChoice));
-        league.removePlayerFromTeam(teamChoice, playerChoice);
-        System.out.printf("%s removed from Team %s.%n", playerChoice, teamChoice);
+        if (league.getTeams().size() < 1) {
+            System.out.printf("There are currently no teams in the league! Please create a team first.");
+        } else if (league.getAssignedPlayerCount() < 1) {
+            System.out.printf("There are currently no players assigned to any teams in the league! Please assign a player first.");
+        } else {
+            String teamChoice = promptForTeamChoice(true);
+            String playerChoice = promptForPlayerChoice(league.getTeamPlayers(teamChoice));
+            league.removePlayerFromTeam(teamChoice, playerChoice);
+            System.out.printf("%s removed from Team %s.%n", playerChoice, teamChoice);
+        }
+
     }
 
     private ArrayList<String> getAndPrintAvailablePlayers(Set<Player> players) {
@@ -130,12 +139,14 @@ public class Menu {
     }
 
     private String promptForPlayerChoice(Set<Player> players) {
+        System.out.printf("Available Players:%n");
         ArrayList<String> availablePlayers = getAndPrintAvailablePlayers(players);
         int choice = promptForInputExpectingInteger("Please choose an option: ", availablePlayers.size()) - 1;
         return availablePlayers.get(choice);
     }
 
     private String promptForTeamChoice(boolean onlyNonEmptyTeams) {
+        System.out.printf("Available Teams:%n");
         ArrayList<String> availableTeams = getAndPrintAvailableTeams(league.getTeams(), onlyNonEmptyTeams);
         int choice = promptForInputExpectingInteger("Please choose an option: ", availableTeams.size()) - 1;
         return availableTeams.get(choice);

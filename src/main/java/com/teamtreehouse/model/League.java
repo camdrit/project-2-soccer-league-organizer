@@ -45,6 +45,14 @@ public class League {
         return null;
     }
 
+    public int getAssignedPlayerCount() {
+        int count = 0;
+        for(Map.Entry<String, Team> team : getTeams().entrySet()) {
+            count += team.getValue().getPlayers().size();
+        }
+        return count;
+    }
+
     public boolean createTeam(String teamName, String coachName) throws Exception {
         if (teams.size() > freePlayers.size()) {
             throw new MaximumTeamsException("The number of teams exceeds the amount of free players. No more teams may be created!");
