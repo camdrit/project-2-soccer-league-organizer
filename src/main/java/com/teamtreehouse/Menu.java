@@ -131,7 +131,9 @@ public class Menu {
                     System.out.printf(" - %s%n", player.toString());
                 });
                 System.out.printf("Total Players in Class: %d%n", players.size());
+
             });
+            System.out.printf("Experience Rating: %.0f%%%n", league.getTeams().get(teamChoice).calculateExperienceRating());
         }
     }
 
@@ -150,6 +152,7 @@ public class Menu {
                         System.out.printf(" - %s%n", player.toString());
                     });
                     System.out.printf("Experience Rating: %.0f%%%n", team.calculateExperienceRating());
+                    printAggregateHeightTotals(team.getName());
                 }
             });
         }
@@ -164,6 +167,15 @@ public class Menu {
             String teamChoice = promptForTeamChoice(true);
             printTeamPlayers(teamChoice);
         }
+    }
+
+    private void printAggregateHeightTotals(String teamName) {
+        Map<String, Set<Player>> heightReport = league.generateHeightReport(teamName);
+        System.out.printf("Players By Height Class: ");
+        heightReport.forEach(((s, players) -> {
+            System.out.printf("%s: %d | ", s, players.size());
+        }));
+        System.out.printf("%n");
     }
 
     private void printTeamPlayers(String teamName) {
