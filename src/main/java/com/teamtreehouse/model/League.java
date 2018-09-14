@@ -34,6 +34,10 @@ public class League {
         return freePlayers;
     }
 
+    public Set<Player> getTeamPlayers(String teamName) {
+        return new TreeSet<Player>(teams.get(teamName).getPlayers().values());
+    }
+
     public Player getPlayerByName(String playerName) {
         for (Player player : freePlayers) {
             if (player.getName().equals(playerName)) { return player; }

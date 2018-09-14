@@ -54,7 +54,7 @@ public class Menu {
                 addPlayer();
                 break;
             case "remove":
-                //removePlayer();
+                removePlayer();
                 break;
             case "report":
                 //reportHeight();
@@ -87,10 +87,8 @@ public class Menu {
     }
 
     public void addPlayer() {
-        ArrayList<String> availablePlayers = getAndPrintAvailablePlayers(league.getFreePlayers());
-        int choice = promptForInputExpectingInteger("Please choose an option: ", availablePlayers.size()) - 1;
-        String playerChoice = availablePlayers.get(choice);
-        String teamChoice = promptForTeamChoice();
+        String playerChoice = promptForPlayerChoice(league.getFreePlayers());
+        String teamChoice = promptForTeamChoice(false);
         try {
             league.addPlayerToTeam(teamChoice, playerChoice);
             System.out.printf("%s added to Team %s.%n", playerChoice, teamChoice);
@@ -98,6 +96,13 @@ public class Menu {
             System.out.printf("%s%n", e.getMessage());
         }
 
+    }
+
+    public void removePlayer() {
+        String teamChoice = promptForTeamChoice(true);
+        String playerChoice = promptForPlayerChoice(league.getTeamPlayers(teamChoice));
+        league.removePlayerFromTeam(teamChoice, playerChoice);
+        System.out.printf("%s removed from Team %s.%n", playerChoice, teamChoice);
     }
 
     private ArrayList<String> getAndPrintAvailablePlayers(Set<Player> players) {
@@ -111,19 +116,27 @@ public class Menu {
         return choices;
     }
 
-    private ArrayList<String> getAndPrintAvailableTeams(Map<String, Team> teams) {
+    private ArrayList<String> getAndPrintAvailableTeams(Map<String, Team> teams, boolean onlyNonEmptyTeams) {
         ArrayList<String> choices = new ArrayList<>();
         int index = 1;
         for (Map.Entry<String, Team> team : teams.entrySet()) {
-            System.out.printf("%d.) %s%n", index, team.getValue().toString());
-            choices.add(team.getValue().getName());
-            index++;
+            if ((team.getValue().getPlayers().size() > 0 && onlyNonEmptyTeams) || !onlyNonEmptyTeams) {
+                System.out.printf("%d.) %s%n", index, team.getValue().toString());
+                choices.add(team.getValue().getName());
+                index++;
+            }
         }
         return choices;
     }
 
-    private String promptForTeamChoice() {
-        ArrayList<String> availableTeams = getAndPrintAvailableTeams(league.getTeams());
+    private String promptForPlayerChoice(Set<Player> players) {
+        ArrayList<String> availablePlayers = getAndPrintAvailablePlayers(players);
+        int choice = promptForInputExpectingInteger("Please choose an option: ", availablePlayers.size()) - 1;
+        return availablePlayers.get(choice);
+    }
+
+    private String promptForTeamChoice(boolean onlyNonEmptyTeams) {
+        ArrayList<String> availableTeams = getAndPrintAvailableTeams(league.getTeams(), onlyNonEmptyTeams);
         int choice = promptForInputExpectingInteger("Please choose an option: ", availableTeams.size()) - 1;
         return availableTeams.get(choice);
     }
