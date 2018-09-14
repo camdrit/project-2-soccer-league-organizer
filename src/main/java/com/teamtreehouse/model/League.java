@@ -1,20 +1,18 @@
 package com.teamtreehouse.model;
 
 import com.teamtreehouse.exceptions.MaximumTeamsException;
+import com.teamtreehouse.exceptions.PlayerAlreadyOnTeamException;
 import com.teamtreehouse.exceptions.TeamExistsException;
 
 import java.util.*;
 
 public class League {
-    private TreeMap heightClasses;
+    private Map<String, int[]> heightClasses;
     private Map<String, Team> teams;
-    private TreeMap<String, Player> freePlayers;
+    private Set<Player> freePlayers;
 
     public League(Player[] players) {
-        freePlayers = new TreeMap<>();
-        Arrays.asList(players).forEach((player -> {
-            freePlayers.put(player.getName(), player);
-        }));
+        freePlayers = new TreeSet<>(Arrays.asList(players));
         heightClasses = new TreeMap<String, int[]>()
         {{
             put("small", new int[]{35, 40});
@@ -32,8 +30,15 @@ public class League {
         return teams;
     }
 
-    public Map<String, Player> getFreePlayers() {
+    public Set<Player> getFreePlayers() {
         return freePlayers;
+    }
+
+    public Player getPlayerByName(String playerName) {
+        for (Player player : freePlayers) {
+            if (player.getName().equals(playerName)) { return player; }
+        }
+        return null;
     }
 
     public boolean createTeam(String teamName, String coachName) throws Exception {
@@ -47,12 +52,14 @@ public class League {
         }
     }
 
-    public boolean addPlayerToTeam(String teamName, String playerName) {
-        return teams.get(teamName).addPlayer(freePlayers.remove(playerName));
+    public void addPlayerToTeam(String teamName, String playerName) throws PlayerAlreadyOnTeamException {
+        Player playerToAdd = getPlayerByName(playerName);
+        boolean results = teams.get(teamName).addPlayer(playerToAdd);
+        if (results) { freePlayers.remove(playerToAdd); } else { throw new PlayerAlreadyOnTeamException(playerName + " is already on Team " + teamName + "!"); }
     }
 
     public void removePlayerFromTeam(String teamName, String playerName) {
-        freePlayers.put(playerName, teams.get(teamName).removePlayer(playerName));
+        freePlayers.add(teams.get(teamName).removePlayer(playerName));
     }
 
 }

@@ -28,15 +28,6 @@ public class Team implements Comparable<Team> {
         return players;
     }
 
-    public Player getPlayerByName(String playerName) {
-        for (Map.Entry<String, Player> player : players.entrySet()) {
-            if (playerName.equals(player.getKey())) {
-                return player.getValue();
-            }
-        }
-        return null;
-    }
-
     public boolean addPlayer(Player player) {
         if (players.get(player.getName()) == null) {
             players.put(player.getName(), player);

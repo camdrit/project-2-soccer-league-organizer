@@ -2,12 +2,13 @@ package com.teamtreehouse;
 
 import com.teamtreehouse.exceptions.MaximumTeamsException;
 import com.teamtreehouse.model.League;
+import com.teamtreehouse.model.Player;
+import com.teamtreehouse.model.Team;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 public class Menu {
     private Map<String, String> menuOptions;
@@ -50,7 +51,7 @@ public class Menu {
                 createTeam();
                 break;
             case "add":
-                //addPlayer();
+                addPlayer();
                 break;
             case "remove":
                 //removePlayer();
@@ -85,6 +86,48 @@ public class Menu {
         }
     }
 
+    public void addPlayer() {
+        ArrayList<String> availablePlayers = getAndPrintAvailablePlayers(league.getFreePlayers());
+        int choice = promptForInputExpectingInteger("Please choose an option: ", availablePlayers.size()) - 1;
+        String playerChoice = availablePlayers.get(choice);
+        String teamChoice = promptForTeamChoice();
+        try {
+            league.addPlayerToTeam(teamChoice, playerChoice);
+            System.out.printf("%s added to Team %s.%n", playerChoice, teamChoice);
+        } catch (Exception e) {
+            System.out.printf("%s%n", e.getMessage());
+        }
+
+    }
+
+    private ArrayList<String> getAndPrintAvailablePlayers(Set<Player> players) {
+        ArrayList<String> choices = new ArrayList<>();
+        int index = 1;
+        for (Player player : players) {
+            System.out.printf("%d.) %s%n", index, player.toString());
+            choices.add(player.getName());
+            index++;
+        }
+        return choices;
+    }
+
+    private ArrayList<String> getAndPrintAvailableTeams(Map<String, Team> teams) {
+        ArrayList<String> choices = new ArrayList<>();
+        int index = 1;
+        for (Map.Entry<String, Team> team : teams.entrySet()) {
+            System.out.printf("%d.) %s%n", index, team.getValue().toString());
+            choices.add(team.getValue().getName());
+            index++;
+        }
+        return choices;
+    }
+
+    private String promptForTeamChoice() {
+        ArrayList<String> availableTeams = getAndPrintAvailableTeams(league.getTeams());
+        int choice = promptForInputExpectingInteger("Please choose an option: ", availableTeams.size()) - 1;
+        return availableTeams.get(choice);
+    }
+
     private String promptForInput(String message) {
         String response = "";
         while (response.isEmpty()) {
@@ -113,7 +156,7 @@ public class Menu {
             } catch (NumberFormatException e) {
                 System.out.printf("The value you provided was not a non-zero number. Please try again. %n");
             } catch (IndexOutOfBoundsException e) {
-                System.out.printf("The value you provided was greater than the maximum value: %d", maximumValue);
+                System.out.printf("The value you provided was greater than the maximum value: %d%n", maximumValue);
             }
         }
         return response;
